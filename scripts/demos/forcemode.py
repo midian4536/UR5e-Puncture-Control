@@ -42,9 +42,7 @@ rtde_c.forceModeSetDamping(DAMPING)
 rtde_c.forceMode([0, 0, 0, 0, 0, 0], SELECTION_VECTOR, [0, 0, 0, 0, 0, 0], TYPE, LIMITS)
 
 logger.info("Force mode initialized.")
-
 time.sleep(1)
-
 stop_flag = True
 
 try:
