@@ -1,0 +1,10 @@
+.venv/
+.vscode/
+
+datasets/
+configs/train/
+configs/temp/
+outputs/
+
+__pycache__/
+*.pyc

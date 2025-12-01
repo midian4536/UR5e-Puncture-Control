@@ -1,0 +1,11 @@
+---
+control:
+  damping: 0.01
+  force_threshold: 3
+  gain_scaling: 1
+  limits: [10.0, 10.0, 10.0, 1.0, 1.0, 1.0]
+  loop_interval: 0.01
+  selection_vector: [1, 1, 1, 0, 0, 0]
+  type: 2
+robot:
+  ip: 192.168.11.5
