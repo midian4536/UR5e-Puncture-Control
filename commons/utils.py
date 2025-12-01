@@ -1,25 +1,24 @@
-import yaml, shutil
 from pathlib import Path
-from typing import Any
 
 
-class ConfigLoader:
-    def __init__(self, config_path):
-        self.config_path = Path(config_path)
-        with self.config_path.open("r") as f:
-            self.cfg = yaml.safe_load(f)
+def find_config_path(filename: str, target_dir: str = "configs") -> Path:
+    current = Path(__file__).resolve().parent
 
-    def get(self, *keys, default: Any = None) -> Any:
-        val = self.cfg
-        for k in keys:
-            if not isinstance(val, dict) or k not in val:
-                return default
-            val = val[k]
-        return val
+    while True:
+        candidate_dir = current / target_dir
+        if candidate_dir.exists() and candidate_dir.is_dir():
+            cfg_path = candidate_dir / filename
+            if cfg_path.exists():
+                return cfg_path
+            else:
+                raise FileNotFoundError(
+                    f"Found '{target_dir}' but '{filename}' does not exist: {cfg_path}"
+                )
 
-    def save_copy(self, out_dir):
-        out_dir = Path(out_dir)
-        out_dir.mkdir(parents=True, exist_ok=True)
-        dst = out_dir / "config.yaml"
-        shutil.copy(self.config_path, dst)
-        return dst
+        if current.parent == current:
+            break
+        current = current.parent
+
+    raise FileNotFoundError(
+        f"Cannot find '{target_dir}/{filename}' in any parent directory of {Path(__file__).resolve()}"
+    )
