@@ -1,9 +1,7 @@
 .venv/
 .vscode/
 
-datasets/
-configs/train/
-configs/temp/
+temp/
 outputs/
 
 __pycache__/
