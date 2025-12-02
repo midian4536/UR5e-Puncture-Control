@@ -8,11 +8,7 @@
 
 ### 1. `forcemode_csvlog.py`
 
-控制类、数据类、配置类测试。
-
-### 2. `ui_window.py`
-
-UI主窗口测试。
+控制类、数据类、配置类联调。
 
 ### 2. `ui_app.py`
 

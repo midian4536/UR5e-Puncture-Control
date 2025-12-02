@@ -5,7 +5,9 @@ from PyQt5.QtWidgets import (
     QPushButton,
     QHBoxLayout,
     QVBoxLayout,
+    QGridLayout,
 )
+from PyQt5.QtGui import QFont
 from ui.force_plot_canvas import ForcePlotCanvas
 from ui.trajectory_plot_canvas import TrajectoryPlotCanvas
 
@@ -15,23 +17,20 @@ class UIMainWindow(QMainWindow):
         super().__init__()
 
         self.setWindowTitle("UR5e Real Time Monitoring")
-        self.resize(1020, 900)
+        self.resize(1080, 900)
 
         self.central = QWidget(self)
         self.setCentralWidget(self.central)
 
         self.position_labels = self._create_pose_display()
         self.coordinate_status = self._create_status_label()
+        self.button_panel = self._create_button_panel()
 
         self.plot_widget = QWidget(self)
         self.plot_widget.setFixedSize(420, 570)
 
         self.trajectory_widget = QWidget(self)
         self.trajectory_widget.setFixedSize(420, 570)
-
-        self.button_panel = self._create_button_panel()
-
-        self._apply_layout()
 
         layout_plot = QVBoxLayout(self.plot_widget)
         self.force_plot = ForcePlotCanvas(self.plot_widget)
@@ -41,51 +40,36 @@ class UIMainWindow(QMainWindow):
         self.trajectory_plot = TrajectoryPlotCanvas(self.trajectory_widget)
         layout_traj.addWidget(self.trajectory_plot)
 
+        self._apply_layout()
+
     def _create_pose_display(self):
-        labels_xyz = QHBoxLayout()
-        labels_rpy = QHBoxLayout()
+        g = QGridLayout()
+        font_label = QFont()
+        font_label.setBold(True)
 
-        self.lbl_x = QLabel("X")
-        self.lbl_y = QLabel("Y")
-        self.lbl_z = QLabel("Z")
-        self.lbl_rx = QLabel("Rx")
-        self.lbl_ry = QLabel("Ry")
-        self.lbl_rz = QLabel("Rz")
+        names = ["X", "Y", "Z", "Rx", "Ry", "Rz"]
+        self.vals = []
 
-        for lbl in [self.lbl_x, self.lbl_y, self.lbl_z]:
-            labels_xyz.addWidget(lbl)
-        for lbl in [self.lbl_rx, self.lbl_ry, self.lbl_rz]:
-            labels_rpy.addWidget(lbl)
-
-        self.val_x = QLabel("0.0000")
-        self.val_y = QLabel("0.0000")
-        self.val_z = QLabel("0.0000")
-        self.val_rx = QLabel("0.0000")
-        self.val_ry = QLabel("0.0000")
-        self.val_rz = QLabel("0.0000")
-
-        labels_val_xyz = QHBoxLayout()
-        labels_val_rpy = QHBoxLayout()
-
-        for val in [self.val_x, self.val_y, self.val_z]:
-            labels_val_xyz.addWidget(val)
-        for val in [self.val_rx, self.val_ry, self.val_rz]:
-            labels_val_rpy.addWidget(val)
-
-        pose_layout = QVBoxLayout()
-        pose_layout.addLayout(labels_xyz)
-        pose_layout.addLayout(labels_val_xyz)
-        pose_layout.addLayout(labels_rpy)
-        pose_layout.addLayout(labels_val_rpy)
+        for i, name in enumerate(names):
+            lbl = QLabel(name)
+            lbl.setFont(font_label)
+            val = QLabel("0.0000")
+            val.setFont(QFont("", 10))
+            g.addWidget(lbl, i // 3, (i % 3) * 2)
+            g.addWidget(val, i // 3, (i % 3) * 2 + 1)
+            self.vals.append(val)
 
         container = QWidget()
-        container.setLayout(pose_layout)
+        container.setLayout(g)
         return container
 
     def _create_status_label(self):
-        label = QPushButton("Monitoring...")
-        label.setEnabled(False)
-        return label
+        btn = QPushButton("Monitoring...")
+        btn.setEnabled(False)
+        btn.setStyleSheet(
+            "QPushButton{background:#e0e0e0;border-radius:6px;padding:6px;font-weight:bold;}"
+        )
+        return btn
 
     def _create_button_panel(self):
         layout = QHBoxLayout()
@@ -98,19 +82,26 @@ class UIMainWindow(QMainWindow):
         self.btn_stop_record.setEnabled(False)
         self.btn_replay.setEnabled(False)
 
-        layout.addWidget(self.btn_start_record)
-        layout.addWidget(self.btn_stop_record)
-        layout.addWidget(self.btn_replay)
-        layout.addWidget(self.btn_exit)
+        buttons = [
+            self.btn_start_record,
+            self.btn_stop_record,
+            self.btn_replay,
+            self.btn_exit,
+        ]
+
+        for b in buttons:
+            b.setFixedHeight(32)
+            b.setStyleSheet("QPushButton{padding:6px 14px;}")
+
+        for b in buttons:
+            layout.addWidget(b)
 
         container = QWidget()
         container.setLayout(layout)
         return container
 
-
     def _apply_layout(self):
         layout = QVBoxLayout()
-
         layout.addWidget(self.position_labels)
         layout.addWidget(self.coordinate_status)
         layout.addWidget(self.button_panel)
@@ -120,17 +111,22 @@ class UIMainWindow(QMainWindow):
         two_plots.addWidget(self.trajectory_widget)
 
         layout.addLayout(two_plots)
+        layout.setSpacing(12)
 
         self.central.setLayout(layout)
 
     def update_tcp_pose(self, tcp_pose):
-        self.val_x.setText(f"{tcp_pose[0]:.4f}")
-        self.val_y.setText(f"{tcp_pose[1]:.4f}")
-        self.val_z.setText(f"{tcp_pose[2]:.4f}")
-
-        self.val_rx.setText(f"{tcp_pose[3]:.4f}")
-        self.val_ry.setText(f"{tcp_pose[4]:.4f}")
-        self.val_rz.setText(f"{tcp_pose[5]:.4f}")
+        for i in range(6):
+            self.vals[i].setText(f"{tcp_pose[i]:.4f}")
 
     def set_status(self, text):
         self.coordinate_status.setText(text)
+
+
+if __name__ == "__main__":
+    from PyQt5.QtWidgets import QApplication
+
+    app = QApplication([])
+    ui = UIMainWindow()
+    ui.show()
+    app.exec_()

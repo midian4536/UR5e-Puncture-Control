@@ -28,9 +28,6 @@ class RobotController:
     def init_force_mode(self):
         self.c.forceModeSetGainScaling(self.gain_scaling)
         self.c.forceModeSetDamping(self.damping)
-        self.c.forceMode(
-            [0] * 6, self.selection_vector, [0] * 6, self.type, self.limits
-        )
 
     def step(self) -> dict:
         t_start = self.c.initPeriod()

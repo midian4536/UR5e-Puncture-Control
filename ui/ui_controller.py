@@ -68,8 +68,12 @@ class UIController:
     def replay_trajectory(self):
         self.ui.set_status("Returning...")
 
-        for q in reversed(self.trajectory):
-            self.controller.c.moveJ(q, 0.2, 0.2)
+        if len(self.trajectory) > 0:
+            path = []
+            for q in reversed(self.trajectory):
+                p = list(q) + [0.2, 0.2, 0.02]
+                path.append(p)
+            self.controller.c.moveJ(path, False)
 
         self.ui.set_status("Returned")
 
