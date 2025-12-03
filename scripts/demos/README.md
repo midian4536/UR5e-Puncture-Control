@@ -24,3 +24,13 @@
 - 关节电流 (`Current`)
 - 关节电压 (`Voltage`)
 - 关节力矩 (`JointTorques`)
+
+---
+
+### 3. `visual.py`
+获得outputs目录下最新的runtime目录，进行可视化，包括：
+
+- 关节电流 (`Current`)
+- 关节电压 (`Voltage`)
+- 关节力矩 (`JointTorques`)
+- TCP轨迹
