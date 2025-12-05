@@ -34,3 +34,8 @@
 - 关节电压 (`Voltage`)
 - 关节力矩 (`JointTorques`)
 - TCP轨迹
+
+---
+
+### 4. `direct_torq.py`
+直接控制关节扭矩。
