@@ -38,4 +38,19 @@
 ---
 
 ### 4. `direct_torq.py`
-直接控制关节扭矩。
+使用 RTDE 的 `directTorque` 接口 **直接控制关节扭矩** 的最小示例。
+
+---
+
+### 5. `torq_curr_plot.py`
+用于在 `directTorque` 基础上分析 **“指令扭矩–实际扭矩–电机电流”关系** 的实验脚本。
+
+> ⚠ 当前版本尚未更新，仍为 **错误实现，存在以下问题：**
+>
+> - 使用了 `rtde_c.getJointTorques()` 在实时控制循环中读取关节力矩  
+> - `RTDEControlInterface` 的读取接口是阻塞式的，会破坏 500 Hz 控制周期的实时性  
+> - 这会导致扭矩控制不稳定，波形畸变
+
+**后续需要的优化方向：**
+
+- 将关节力矩读取统一改为 `rtde_r.getJointTorques()`，与 `getActualCurrent()` 一样都走 `RTDEReceive` 实时数据通道。
