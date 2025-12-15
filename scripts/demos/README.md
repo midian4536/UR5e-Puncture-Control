@@ -8,7 +8,7 @@
 
 ### 1. `forcemode.py`
 一个最小示例，演示如何：
-- 连接 UR5e 机械臂  
+- 连接 UR5e 
 - 初始化力控模式（Force Mode）
 
 ---
