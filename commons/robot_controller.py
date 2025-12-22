@@ -13,12 +13,14 @@ class RobotController:
         self.damping = cfg.get("force_mode", "damping")
         self.gain_scaling = cfg.get("force_mode", "gain_scaling")
         self.force_threshold = cfg.get("force_mode", "threshold")
+        self.time_stop = cfg.get("force_mode", "time_stop")
 
         self.c = rtde_control.RTDEControlInterface(self.ip)
         self.r = rtde_receive.RTDEReceiveInterface(self.ip)
 
         self.c.zeroFtSensor()
         self.stop_flag = True
+        self.low_force_start_time = None
 
     def move_to_start(self):
         joints = self.c.getInverseKinematics(self.start_pose, self.r.getActualQ())
@@ -38,13 +40,17 @@ class RobotController:
 
         if fmag > self.force_threshold:
             self.stop_flag = False
+            self.low_force_start_time = None
             self.c.forceMode(
                 [0] * 6, self.selection_vector, [0] * 6, self.type, self.limits
             )
         else:
-            if not self.stop_flag:
-                self.c.forceModeStop()
-                self.stop_flag = True
+            if self.low_force_start_time is None:
+                self.low_force_start_time = time.time()
+            elif time.time() - self.low_force_start_time > self.time_stop:
+                if not self.stop_flag:
+                    self.c.forceModeStop()
+                    self.stop_flag = True
 
         state = {
             "timestamp": time.time(),
