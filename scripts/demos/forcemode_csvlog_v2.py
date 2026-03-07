@@ -9,10 +9,11 @@ SELECTION_VECTOR = [1, 1, 1, 0, 0, 0]
 TYPE = 2
 LIMITS = [10.0, 10.0, 10.0, 1.0, 1.0, 1.0]
 DAMPING = 0.003
-GAIN_SCALING = 1.0
+GAIN_SCALING = 1.9
 
 START_POSE = [0, -0.4, 0.3, math.pi, 0, 0]
-FORCE_THRESHOLD = 7.0
+FORCE_THRESHOLD = 1
+#[0.147,-0.444,-0.034,0,0,0]
 
 logger.remove()
 logger.add(

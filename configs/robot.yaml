@@ -3,13 +3,14 @@ robot:
   start_pose: [0, -0.4, 0.3, 3.14, 0, 0]
 
 force_mode:
-  selection_vector: [1, 1, 1, 0, 0, 0]
+  selection_vector: [1, 1, 1, 1, 1, 1]
+  #selection_vector: [1, 1, 1, 0, 0, 0]
   type: 2
   limits: [10, 10, 10, 1, 1, 1]
   damping: 0.003
   gain_scaling: 1.0
   threshold: 2.0
-  time_stop: 2.0
+  time_stop: 1.0
 
 logging:
   out_dir: "outputs"

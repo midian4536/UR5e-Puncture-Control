@@ -21,6 +21,7 @@ class RobotController:
         self.c.zeroFtSensor()
         self.stop_flag = True
         self.low_force_start_time = None
+        self.count =0
 
     def move_to_start(self):
         joints = self.c.getInverseKinematics(self.start_pose, self.r.getActualQ())
@@ -30,13 +31,15 @@ class RobotController:
     def init_force_mode(self):
         self.c.forceModeSetGainScaling(self.gain_scaling)
         self.c.forceModeSetDamping(self.damping)
-
     def step(self) -> dict:
         t_start = self.c.initPeriod()
 
         wrench = np.array(self.r.getActualTCPForce())
         force = wrench[:3]
         fmag = np.linalg.norm(force)
+        # if self.count % 10 == 0:
+        #     print(fmag)
+        # self.count += 1
 
         if fmag > self.force_threshold:
             self.stop_flag = False
@@ -50,6 +53,7 @@ class RobotController:
             elif time.time() - self.low_force_start_time > self.time_stop:
                 if not self.stop_flag:
                     self.c.forceModeStop()
+                    self.c.stopJ()
                     self.stop_flag = True
 
         state = {
@@ -60,7 +64,8 @@ class RobotController:
             "qd": np.array(self.r.getActualQd()),
             "curr": np.array(self.r.getActualCurrent()),
             "volt": np.array(self.r.getActualJointVoltage()),
-            "torq": np.array(self.c.getJointTorques()),
+            #"torq": np.array(self.c.getJointTorques()),
+            "torq": np.eye(6),
         }
 
         self.c.waitPeriod(t_start)

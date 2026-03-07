@@ -45,6 +45,7 @@ rtde_c.forceModeSetDamping(DAMPING)
 logger.info("Force mode initialized.")
 time.sleep(1)
 stop_flag = True
+low_force_start_time = None
 
 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 output_dir = Path("outputs") / f"runtime_{timestamp}"
@@ -80,6 +81,7 @@ try:
         if fmag > FORCE_THRESHOLD:
             logger.info(f"Force above threshold ({fmag:.2f} N). Continuing force mode.")
             stop_flag = False
+            low_force_start_time = None
 
             rtde_c.forceMode(
                 [0, 0, 0, 0, 0, 0],
@@ -89,10 +91,16 @@ try:
                 LIMITS,
             )
         else:
-            if not stop_flag:
-                rtde_c.forceModeStop()
-                stop_flag = True
-                logger.info("Force below threshold. Stopping movement.")
+            if low_force_start_time is None:
+                low_force_start_time = time.time()
+                logger.debug(f"Low force detected. Starting timer: {low_force_start_time:.2f}")
+            elif time.time() - low_force_start_time > 2.0:
+                if not stop_flag:
+                    rtde_c.forceModeStop()
+                    stop_flag = True
+                    logger.info("Force below threshold for more than 2 seconds. Stopping movement.")
+            else:
+                logger.debug(f"Low force detected for {time.time() - low_force_start_time:.2f} seconds. Waiting for 2 seconds.")
 
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
 
