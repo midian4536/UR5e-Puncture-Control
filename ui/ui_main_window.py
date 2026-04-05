@@ -16,6 +16,11 @@ class UIMainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        # 设置全局字体为更大字号
+        font = QFont()
+        font.setPointSize(14)  # 你可以根据需要调整字号
+        self.setFont(font)
+
         self.setWindowTitle("UR5e Real Time Monitoring")
         self.resize(1080, 900)
 
@@ -26,18 +31,22 @@ class UIMainWindow(QMainWindow):
         self.coordinate_status = self._create_status_label()
         self.button_panel = self._create_button_panel()
 
+        from PyQt5.QtWidgets import QSizePolicy
+
         self.plot_widget = QWidget(self)
-        self.plot_widget.setFixedSize(420, 570)
+        self.plot_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         self.trajectory_widget = QWidget(self)
-        self.trajectory_widget.setFixedSize(420, 570)
+        self.trajectory_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         layout_plot = QVBoxLayout(self.plot_widget)
         self.force_plot = ForcePlotCanvas(self.plot_widget)
+        self.force_plot.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         layout_plot.addWidget(self.force_plot)
 
         layout_traj = QVBoxLayout(self.trajectory_widget)
         self.trajectory_plot = TrajectoryPlotCanvas(self.trajectory_widget)
+        self.trajectory_plot.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         layout_traj.addWidget(self.trajectory_plot)
 
         self._apply_layout()
@@ -66,6 +75,9 @@ class UIMainWindow(QMainWindow):
     def _create_status_label(self):
         btn = QPushButton("Monitoring...")
         btn.setEnabled(False)
+        font = QFont()
+        font.setPointSize(16)
+        btn.setFont(font)
         btn.setStyleSheet(
             "QPushButton{background:#e0e0e0;border-radius:6px;padding:6px;font-weight:bold;}"
         )
@@ -90,8 +102,12 @@ class UIMainWindow(QMainWindow):
         ]
 
         for b in buttons:
-            b.setFixedHeight(32)
-            b.setStyleSheet("QPushButton{padding:6px 14px;}")
+            b.setFixedHeight(48)
+            b.setMinimumWidth(120)
+            font = QFont()
+            font.setPointSize(16)
+            b.setFont(font)
+            b.setStyleSheet("QPushButton{padding:10px 24px;}")
 
         for b in buttons:
             layout.addWidget(b)
@@ -107,8 +123,8 @@ class UIMainWindow(QMainWindow):
         layout.addWidget(self.button_panel)
 
         two_plots = QHBoxLayout()
-        two_plots.addWidget(self.plot_widget)
-        two_plots.addWidget(self.trajectory_widget)
+        two_plots.addWidget(self.plot_widget, stretch=1)
+        two_plots.addWidget(self.trajectory_widget, stretch=1)
 
         layout.addLayout(two_plots)
         layout.setSpacing(12)
